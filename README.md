@@ -1,4 +1,4 @@
-VAKİT REHBERİM (PWA) v1.1.1
+VAKİT REHBERİM (PWA) v1.1.2
 
 Vakit Rehberim, T.C. Diyanet İşleri Başkanlığı'nın resmi verileriyle birebir uyumlu (sıfır sapma), tamamen çevrimdışı (offline) çalışan, arka planda internet tüketmeyen, hafif ve modern bir PWA (Progressive Web App) projesidir.
 
