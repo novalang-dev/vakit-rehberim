@@ -1,0 +1,29 @@
+name: Namaz Vakti Bildirim Robotu
+
+on:
+  schedule:
+    # Her gün UTC 15:00'te (Türkiye saatiyle 18:00) çalışır
+    - cron: '0 15 * * *'
+  workflow_dispatch: # Test etmek için manuel çalıştırma butonu
+
+jobs:
+  send-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu Çek
+        uses: actions/checkout@v3
+
+      - name: Node.js Kur
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Bağımlılıkları Yükle
+        run: npm install web-push
+
+      - name: Bildirim Gönder
+        env:
+          VAPID_PUBLIC: ${{ secrets.VAPID_PUBLIC }}
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          SUBSCRIPTION_JSON: ${{ secrets.SUBSCRIPTION_JSON }}
+        run: node send-push.js
