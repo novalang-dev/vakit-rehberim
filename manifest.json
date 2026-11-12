@@ -1,7 +1,8 @@
 {
   "name": "Vakit Rehberim",
   "short_name": "Vakit Rehberim",
-  "start_url": "/",
+  "start_url": "/vakit-rehberim/",
+  "scope": "/vakit-rehberim/",
   "display": "standalone",
   "background_color": "#0b3d2e",
   "theme_color": "#0b3d2e",
