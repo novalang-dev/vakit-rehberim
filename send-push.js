@@ -1,34 +1,50 @@
 const webpush = require('web-push');
 const fs = require('fs');
 
-// GitHub Secrets'tan gizli bilgileri alıyoruz
+// GitHub Secrets'tan bilgileri al
 const publicVapidKey = process.env.VAPID_PUBLIC;
 const privateVapidKey = process.env.VAPID_PRIVATE;
 const subscription = JSON.parse(process.env.SUBSCRIPTION_JSON);
 
 webpush.setVapidDetails(
-  'mailto:ahmetensar602@gmail.com', // E-posta adresin
+  'mailto:ahmetensar602@gmail.com',
   publicVapidKey,
   privateVapidKey
 );
 
-// Vakit hesaplama motorumuzu (motor.js ve db.js) buraya çağırıyoruz
+// Veritabanı ve motoru yükle
 const dbCode = fs.readFileSync('js/db.js', 'utf8');
 const motorCode = fs.readFileSync('js/motor.js', 'utf8');
-
-// Veritabanını ve motoru Node.js ortamında çalıştır
 eval(dbCode);
-eval(motorCode.replace(/if \(typeof window[\s\S]*?$/, '')); // window kısmını temizle
+eval(motorCode);
 
 const now = new Date();
 const y = now.getFullYear();
 const m = now.getMonth() + 1;
 const d = now.getDate();
 
-// Test için Yozgat/Sorgun'u sabitledik. Kendi şehrini buraya yazabilirsin.
-const vakitler = getTimes(y, m, d, 'Yozgat', 'Sorgun');
+let city = 'Yozgat';
+let dist = 'Sorgun';
 
-// Hangi vakte göre bildirim atacağımızı seçelim (Örneğin Akşam)
+// GÜVENLİK KONTROLÜ: Eğer Yozgat/Sorgun bulunamazsa, veritabanındaki ilk geçerli konumu kullan
+if (typeof IL_ILCE_DB !== 'undefined') {
+  if (!IL_ILCE_DB[city] || !IL_ILCE_DB[city][dist]) {
+    console.log(`Uyarı: ${city}/${dist} bulunamadı. İlk geçerli konum aranıyor...`);
+    const firstCity = Object.keys(IL_ILCE_DB)[0];
+    const firstDist = Object.keys(IL_ILCE_DB[firstCity])[0];
+    city = firstCity;
+    dist = firstDist;
+    console.log(`Kullanılan konum: ${city}/${dist}`);
+  }
+}
+
+const vakitler = getTimes(y, m, d, city, dist);
+
+if (!vakitler) {
+  console.error("Kritik Hata: Vakitler hesaplanamadı!");
+  process.exit(1);
+}
+
 const hedefVakitAdi = 'Akşam';
 const hedefVakitSaati = vakitler.aksam;
 
