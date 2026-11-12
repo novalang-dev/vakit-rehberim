@@ -122,3 +122,5 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { getTimes };
 }
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = { getTimes }; }

@@ -1,5 +1,5 @@
 const webpush = require('web-push');
-const fs = require('fs');
+const path = require('path');
 
 // GitHub Secrets'tan bilgileri al
 const publicVapidKey = process.env.VAPID_PUBLIC;
@@ -12,36 +12,32 @@ webpush.setVapidDetails(
   privateVapidKey
 );
 
-// Veritabanı ve motoru yükle
-const dbCode = fs.readFileSync('js/db.js', 'utf8');
-const motorCode = fs.readFileSync('js/motor.js', 'utf8');
-eval(dbCode);
-eval(motorCode);
+// Artık doğrudan modülleri çağırıyoruz
+const IL_ILCE_DB = require('./js/db.js');
+const { getTimes } = require('./js/motor.js');
 
 const now = new Date();
 const y = now.getFullYear();
 const m = now.getMonth() + 1;
 const d = now.getDate();
 
+// İlk geçerli şehri ve ilçeyi bul (Yozgat/Sorgun yoksa)
 let city = 'Yozgat';
 let dist = 'Sorgun';
 
-// GÜVENLİK KONTROLÜ: Eğer Yozgat/Sorgun bulunamazsa, veritabanındaki ilk geçerli konumu kullan
-if (typeof IL_ILCE_DB !== 'undefined') {
-  if (!IL_ILCE_DB[city] || !IL_ILCE_DB[city][dist]) {
-    console.log(`Uyarı: ${city}/${dist} bulunamadı. İlk geçerli konum aranıyor...`);
-    const firstCity = Object.keys(IL_ILCE_DB)[0];
-    const firstDist = Object.keys(IL_ILCE_DB[firstCity])[0];
-    city = firstCity;
-    dist = firstDist;
-    console.log(`Kullanılan konum: ${city}/${dist}`);
-  }
+if (!IL_ILCE_DB[city] || !IL_ILCE_DB[city][dist]) {
+  console.log(`Uyarı: ${city}/${dist} bulunamadı. İlk geçerli konum aranıyor...`);
+  const firstCity = Object.keys(IL_ILCE_DB)[0];
+  const firstDist = Object.keys(IL_ILCE_DB[firstCity])[0];
+  city = firstCity;
+  dist = firstDist;
+  console.log(`Kullanılan konum: ${city}/${dist}`);
 }
 
 const vakitler = getTimes(y, m, d, city, dist);
 
 if (!vakitler) {
-  console.error("Kritik Hata: Vakitler hesaplanamadı!");
+  console.error("Kritik Hata: Vakitler hesaplanamadı! Lütfen db.js ve motor.js dosyalarını kontrol edin.");
   process.exit(1);
 }
 
