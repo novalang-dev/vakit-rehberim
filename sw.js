@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vakit-rehberim-v1.1'; // Sürümü artırdık ki eski önbelleği temizlesin
+const CACHE_NAME = 'vakit-rehberim-v1.1.1'; // Sürümü artırdık ki eski önbelleği temizlesin
 const ASSETS = [
   '/',
   '/index.html',

@@ -15,8 +15,10 @@ webpush.setVapidDetails(
 // Vakit hesaplama motorumuzu (motor.js ve db.js) buraya çağırıyoruz
 const dbCode = fs.readFileSync('js/db.js', 'utf8');
 const motorCode = fs.readFileSync('js/motor.js', 'utf8');
+
+// Veritabanını ve motoru Node.js ortamında çalıştır
 eval(dbCode);
-eval(motorCode);
+eval(motorCode.replace(/if \(typeof window[\s\S]*?$/, '')); // window kısmını temizle
 
 const now = new Date();
 const y = now.getFullYear();

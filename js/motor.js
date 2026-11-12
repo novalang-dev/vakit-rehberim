@@ -116,4 +116,9 @@ function getTimes(y, m, d, city, dist) {
 }
 
 // app.js'in bu fonksiyonu görebilmesi için pencereye (window) ekliyoruz
-window.getTimes = getTimes;
+if (typeof window !== 'undefined') {
+  window.getTimes = getTimes;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { getTimes };
+}
