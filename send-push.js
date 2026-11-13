@@ -8,7 +8,7 @@ const privateVapidKey = process.env.VAPID_PRIVATE;
 const subscription = JSON.parse(process.env.SUBSCRIPTION_JSON);
 
 webpush.setVapidDetails(
-  'mailto:ahmetensar602@gmail.com', // E-posta adresin
+  'mailto:ahmetensar602@gmail.com',
   publicVapidKey,
   privateVapidKey
 );
@@ -31,9 +31,8 @@ fs.writeFileSync(tempPath, tempModuleCode);
 
 const { IL_ILCE_DB, getTimes } = require(tempPath);
 
-// Tarih ve saat bilgisi (Türkiye saati ile karşılaştırmak için)
+// Tarih ve saat (Türkiye saati)
 const now = new Date();
-// GitHub Actions UTC (Londra) saatine göre çalışır. Türkiye saati UTC+3'tür.
 const trDate = new Date(now.getTime() + (3 * 60 * 60 * 1000)); 
 const y = trDate.getUTCFullYear();
 const m = trDate.getUTCMonth() + 1;
@@ -58,7 +57,6 @@ if (!vakitler) {
   process.exit(1);
 }
 
-// İmsak ve Güneş hariç, sadece bildirim atılacak vakitler
 const hedefVakitler = {
   'ogle': 'Öğle',
   'ikindi': 'İkindi',
@@ -69,15 +67,11 @@ const hedefVakitler = {
 let bildirimGonderilecekVakit = null;
 let vakitSaati = "";
 
-// Şu anki saatin, vakitlerden herhangi birine denk gelip gelmediğini kontrol et
 for (const [key, isim] of Object.entries(hedefVakitler)) {
-  const vakit = vakitler[key]; // Örn: "12:28"
+  const vakit = vakitler[key];
   if (vakit) {
     const [vH, vM] = vakit.split(':').map(Number);
-    
-    // Eğer şu anki saat ve dakika, vaktin saat ve dakikasına eşitse (veya 1 dk sapma varsa)
-    // GitHub bazen geç çalışabileceği için 0 veya 1 dakika tolerans koyuyoruz.
-    if (trHour === vH && Math.abs(trMinute - vM) <= 1) {
+    if (trHour === vH && Math.abs(trMinute - vM) <= 3) {
       bildirimGonderilecekVakit = isim;
       vakitSaati = vakit;
       break;
@@ -85,8 +79,24 @@ for (const [key, isim] of Object.entries(hedefVakitler)) {
   }
 }
 
-// Eğer bir vakte denk geliyorsa bildirim gönder
 if (bildirimGonderilecekVakit) {
+  // --- HAFIZA KONTROLÜ ---
+  const cacheDosyasi = path.join(process.cwd(), '.son-bildirim.json');
+  let hafiza = {};
+  
+  if (fs.existsSync(cacheDosyasi)) {
+    hafiza = JSON.parse(fs.readFileSync(cacheDosyasi, 'utf8'));
+  }
+
+  const bugunTarihi = `${y}-${m}-${d}`;
+  const hafizaAnahtari = `${bugunTarihi}_${bildirimGonderilecekVakit}`;
+
+  // Eğer bugün bu vakit için zaten bildirim attıysak susalım
+  if (hafiza[hafizaAnahtari]) {
+    console.log(`Bugün ${bildirimGonderilecekVakit} için zaten bildirim atıldı. Beklemeye devam...`);
+    process.exit(0);
+  }
+
   console.log(`Şu an ${bildirimGonderilecekVakit} vakti (${vakitSaati}). Bildirim gönderiliyor...`);
   
   const payload = JSON.stringify({
@@ -95,9 +105,13 @@ if (bildirimGonderilecekVakit) {
   });
 
   webpush.sendNotification(subscription, payload)
-    .then(() => console.log('Bildirim Başarıyla Gönderildi!'))
+    .then(() => {
+      console.log('Bildirim Başarıyla Gönderildi!');
+      // Bildirim başarılıysa hafızaya kaydet
+      hafiza[hafizaAnahtari] = true;
+      fs.writeFileSync(cacheDosyasi, JSON.stringify(hafiza));
+    })
     .catch(err => console.error('Hata:', err));
 } else {
-  // Eğer o an ezan vakti değilse hiçbir şey yapma (bildirim gönderme)
   console.log(`Şu an (${trHour}:${trMinute}) ezan vakti değil. Beklemeye devam...`);
 }

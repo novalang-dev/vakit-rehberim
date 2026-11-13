@@ -2,15 +2,7 @@ name: Namaz Vakti Bildirim Robotu
 
 on:
   schedule:
-    # GitHub UTC saatini kullanır. Türkiye saatiyle (UTC+3):
-    # Öğle civarı (TR 12:00 - 13:30 arası için)
-    - cron: '0 9,10 * * *' 
-    # İkindi civarı (TR 15:00 - 16:30 arası için)
-    - cron: '0 12,13 * * *'
-    # Akşam civarı (TR 17:00 - 18:30 arası için)
-    - cron: '0 14,15 * * *'
-    # Yatsı civarı (TR 19:00 - 20:30 arası için)
-    - cron: '0 16,17 * * *'
+    - cron: '*/3 * * * *' 
   workflow_dispatch: 
 
 jobs:
@@ -28,9 +20,23 @@ jobs:
       - name: Bağımlılıkları Yükle
         run: npm install web-push
 
+      # HAFIZA ADIMI: Son bildirim dosyasını geri yükle
+      - name: Hafızayı Geri Yükle
+        uses: actions/cache@v3
+        with:
+          path: .son-bildirim.json
+          key: bildirim-hafizasi-v1
+
       - name: Bildirim Gönder
         env:
           VAPID_PUBLIC: ${{ secrets.VAPID_PUBLIC }}
           VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
           SUBSCRIPTION_JSON: ${{ secrets.SUBSCRIPTION_JSON }}
         run: node send-push.js
+
+      # Hafızayı kaydet (Bir sonraki çalışmada hatırlaması için)
+      - name: Hafızayı Kaydet
+        uses: actions/cache@v3
+        with:
+          path: .son-bildirim.json
+          key: bildirim-hafizasi-v1
