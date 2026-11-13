@@ -8,23 +8,13 @@ const VAKIT_IKONLARI = {
   ikindi: 'fa-solid fa-cloud-sun', aksam: 'fa-solid fa-sun', yatsi: 'fa-solid fa-star'
 };
 
-// SENİN GERÇEK PUBLIC KEY'İN
 const VAPID_PUBLIC_KEY = 'BFp2c82iiKMGd-mEGXKuP4jwA39rZM40O6Izs0jJID3WhWZ8SAMY-3HzBI_M_h_SWwsfrChe3hBApv6YrKzlW98';
+const SECILI_SEHIR_KEY = 'sehir';
+const SECILI_ILCE_KEY = 'ilce';
 
 let geriSayimInterval = null;
 let sonAktifVakit = null;
 
-// URLBase64 Çevirici
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
-  return outputArray;
-}
-
-// Tarihleri Güncelle
 function tarihleriGuncelle() {
   const now = new Date();
   document.getElementById('miladiGun').textContent = now.getDate();
@@ -39,7 +29,6 @@ function tarihleriGuncelle() {
   } catch(e) {}
 }
 
-// Yatay Menü
 function renderHorizontalVakitler(vakitler, aktifVakit) {
   const container = document.getElementById('horizontalVakitler');
   if (!container) return;
@@ -56,30 +45,22 @@ function renderHorizontalVakitler(vakitler, aktifVakit) {
   });
 }
 
-// Haftalık Tablo
 function renderWeeklyTable(vakitler, city, dist) {
   const tbody = document.getElementById('weeklyTableBody');
   if (!tbody) return;
   tbody.innerHTML = '';
-  
   const gunler = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
   const bugun = new Date();
-
   for(let i=0; i<7; i++) {
     let hedefTarih = new Date(bugun);
     hedefTarih.setDate(bugun.getDate() + i);
-    
     const y = hedefTarih.getFullYear();
     const m = hedefTarih.getMonth() + 1;
     const d = hedefTarih.getDate();
-    
     const gVakit = getTimes(y, m, d, city, dist);
-    
     const tr = document.createElement('tr');
     const gunAdi = i === 0 ? 'Bugün' : gunler[hedefTarih.getDay()];
-    
     const displayVakit = gVakit || vakitler;
-    
     tr.innerHTML = `
       <td>${gunAdi}</td>
       <td>${displayVakit.imsak}</td><td>${displayVakit.gunes}</td><td>${displayVakit.ogle}</td>
@@ -89,18 +70,14 @@ function renderWeeklyTable(vakitler, city, dist) {
   }
 }
 
-// Günün İçerikleri
 function gununIcerikleriniYukle() {
   if(typeof Icerikler === 'undefined') return;
   const a = Icerikler.genelAyetler[Math.floor(Math.random() * Icerikler.genelAyetler.length)];
   document.getElementById('gununAyeti').textContent = `"${a.metin}" (${a.kaynak})`;
   const h = Icerikler.genelHadisler[Math.floor(Math.random() * Icerikler.genelHadisler.length)];
   document.getElementById('gununHadisi').textContent = `"${h.metin}" (${h.kaynak})`;
-  const d = Icerikler.genelDualar[Math.floor(Math.random() * Icerikler.genelDualar.length)];
-  document.getElementById('gununDuasi').textContent = `${d.baslik}: ${d.anlam}`;
 }
 
-// Vakit Bulma
 function sonrakiVakitBul(vakitler) {
   const now = new Date();
   const nowMin = now.getHours() * 60 + now.getMinutes();
@@ -126,7 +103,6 @@ function aktifVakitBul(vakitler) {
   return aktifKey;
 }
 
-// Geri Sayım
 function geriSayimBaslat(vakitler) {
   if (geriSayimInterval) clearInterval(geriSayimInterval);
   function tick() {
@@ -153,7 +129,6 @@ function geriSayimBaslat(vakitler) {
   geriSayimInterval = setInterval(tick, 1000);
 }
 
-// Vakitleri Yükle
 function yukle(city, dist) {
   document.getElementById('hedefVakitAdi').textContent = "HESAPLANIYOR...";
   const now = new Date();
@@ -177,7 +152,6 @@ function yukle(city, dist) {
   }
 }
 
-// Menü ve Modallar
 function setupMenuAndModals() {
   const sideMenu = document.getElementById('sideMenu');
   const menuOverlay = document.getElementById('menuOverlay');
@@ -186,12 +160,13 @@ function setupMenuAndModals() {
   const settingsModal = document.getElementById('settingsModal');
   const locationModal = document.getElementById('locationModal');
   const menuAyarlar = document.getElementById('menuAyarlar');
-  const menuKonumlar = document.getElementById('menuKonumlar');
+  const menuCamiler = document.getElementById('menuCamiler');
+  const menuKible = document.getElementById('menuKible');
+  const menuDiniGunler = document.getElementById('menuDiniGunler');
+  const menuGeriBildirim = document.getElementById('menuGeriBildirim');
   const closeSettingsBtn = document.getElementById('closeSettingsBtn');
   const closeLocationBtn = document.getElementById('closeLocationBtn');
   const openLocationBtn = document.getElementById('openLocationBtn');
-  const toggleWeekly = document.getElementById('toggleWeekly');
-  const weeklyTableContainer = document.getElementById('weeklyTableContainer');
 
   if(!sideMenu) return;
 
@@ -200,8 +175,21 @@ function setupMenuAndModals() {
   openMenuBtn.addEventListener('click', () => { sideMenu.classList.add('open'); menuOverlay.classList.add('open'); });
   closeMenuBtn.addEventListener('click', closeMenu);
   menuOverlay.addEventListener('click', closeMenu);
+  
   menuAyarlar.addEventListener('click', () => { closeMenu(); settingsModal.classList.add('open'); });
   closeSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('open'));
+
+  menuCamiler.addEventListener('click', () => {
+    closeMenu();
+    Swal.fire({ icon: 'info', title: 'Yakındaki Camiler', text: 'Çok yakında bu özellik aktif olacak!', confirmButtonText: 'Tamam' });
+  });
+
+  menuKible.addEventListener('click', () => { window.location.href = 'kible.html'; });
+  menuDiniGunler.addEventListener('click', () => { window.location.href = 'dini_gunler.html'; });
+  menuGeriBildirim.addEventListener('click', () => {
+    closeMenu();
+    window.open('https://github.com/novalang-dev/vakit-rehberim/issues/new', '_blank');
+  });
 
   const openLoc = () => {
     closeMenu(); 
@@ -228,62 +216,37 @@ function setupMenuAndModals() {
       };
 
       ilceSelect.onchange = (e) => {
-        localStorage.setItem('sehir', ilSelect.value);
-        localStorage.setItem('ilce', e.target.value);
+        localStorage.setItem(SECILI_SEHIR_KEY, ilSelect.value);
+        localStorage.setItem(SECILI_ILCE_KEY, e.target.value);
         locationModal.classList.remove('open');
         yukle(ilSelect.value, e.target.value);
       };
     }
   };
   
-  menuKonumlar.addEventListener('click', openLoc);
   openLocationBtn.addEventListener('click', openLoc);
   closeLocationBtn.addEventListener('click', () => locationModal.classList.remove('open'));
-
+  
+  const toggleWeekly = document.getElementById('toggleWeekly');
+  const weeklyTableContainer = document.getElementById('weeklyTableContainer');
   if(toggleWeekly) {
     toggleWeekly.addEventListener('change', (e) => {
       weeklyTableContainer.style.display = e.target.checked ? 'block' : 'none';
     });
   }
-
-  // BİLDİRİM BUTONU (Ayarlar içine eklenir)
-  const settingsContent = document.querySelector('.settings-content');
-  if (settingsContent) {
-    const btn = document.createElement('button');
-    btn.textContent = '🔔 Bildirimleri Aç';
-    btn.style = 'width:100%; padding:1rem; background:#f59e0b; color:white; border:none; border-radius:8px; margin-top:1rem; font-weight:bold; cursor:pointer;';
-    
-    btn.onclick = async () => {
-      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        return alert('Tarayıcınız bildirimleri desteklemiyor.');
-      }
-      try {
-        const reg = await navigator.serviceWorker.register('sw.js');
-        await navigator.serviceWorker.ready; // SW'nin aktif olmasını bekle
-
-        const sub = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-        });
-        console.log('=== ABONELİK BAŞARILI ===');
-        console.log(JSON.stringify(sub));
-        alert('Bildirimler açıldı! Lütfen F12 (Konsol) ekranındaki yazıyı kopyalayıp bana gönder.');
-      } catch (err) {
-        console.error('Hata:', err);
-        alert('Hata oluştu: ' + err.message);
-      }
-    };
-    settingsContent.appendChild(btn);
-  }
 }
 
-// Başlat
 document.addEventListener('DOMContentLoaded', () => {
   setupMenuAndModals();
-  if (typeof ZikirMatik !== 'undefined') ZikirMatik.init();
   
-  let kayitliIl = localStorage.getItem('sehir') || 'Yozgat';
-  let kayitliIlce = localStorage.getItem('ilce') || 'Sorgun';
+  let kayitliIl = localStorage.getItem(SECILI_SEHIR_KEY);
+  let kayitliIlce = localStorage.getItem(SECILI_ILCE_KEY);
   
-  yukle(kayitliIl, kayitliIlce); 
+  if (!kayitliIl || !kayitliIlce) {
+    setTimeout(() => {
+      document.getElementById('openLocationBtn').click();
+    }, 500);
+  } else {
+    yukle(kayitliIl, kayitliIlce); 
+  }
 });

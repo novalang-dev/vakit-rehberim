@@ -2,9 +2,16 @@ name: Namaz Vakti Bildirim Robotu
 
 on:
   schedule:
-    # Her gün UTC 15:00'te (Türkiye saatiyle 18:00) çalışır
-    - cron: '0 15 * * *'
-  workflow_dispatch: # Test etmek için manuel çalıştırma butonu
+    # GitHub UTC saatini kullanır. Türkiye saatiyle (UTC+3):
+    # Öğle civarı (TR 12:00 - 13:30 arası için)
+    - cron: '0 9,10 * * *' 
+    # İkindi civarı (TR 15:00 - 16:30 arası için)
+    - cron: '0 12,13 * * *'
+    # Akşam civarı (TR 17:00 - 18:30 arası için)
+    - cron: '0 14,15 * * *'
+    # Yatsı civarı (TR 19:00 - 20:30 arası için)
+    - cron: '0 16,17 * * *'
+  workflow_dispatch: 
 
 jobs:
   send-notification:

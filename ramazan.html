@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ramazan Ayı</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Ramazan Sayfasına Özel Stiller */
+    .ramazan-bg {
+      background: linear-gradient(135deg, #0b132b 0%, #1c2541 100%);
+      position: relative;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Köşe Süslemeleri (Hilaller) */
+    .corner-susleme {
+      position: absolute;
+      color: var(--primary-gold);
+      opacity: 0.15;
+      font-size: 8rem;
+      pointer-events: none;
+    }
+    .ust-sol { top: -20px; left: -20px; transform: rotate(-30deg); }
+    .alt-sag { bottom: -20px; right: -20px; transform: rotate(150deg); }
+
+    /* Süzülen Yıldızlar */
+    .yildiz {
+      position: absolute;
+      background-color: #fff;
+      border-radius: 50%;
+      opacity: 0;
+      animation: yildizKaymasi linear infinite;
+    }
+    @keyframes yildizKaymasi {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
+
+    /* Ortadaki Ramazan Kartı */
+    .ramazan-kart {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 209, 102, 0.3);
+      border-radius: 20px;
+      padding: 3rem 2rem;
+      text-align: center;
+      z-index: 10;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: parla 3s infinite alternate;
+      max-width: 350px;
+      margin: 0 1rem;
+    }
+    @keyframes parla {
+      0% { box-shadow: 0 0 10px rgba(255, 209, 102, 0.1); }
+      100% { box-shadow: 0 0 30px rgba(255, 209, 102, 0.4); }
+    }
+
+    .ramazan-kart i {
+      font-size: 4rem;
+      color: var(--primary-gold);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 15px rgba(255, 209, 102, 0.5);
+    }
+    .ramazan-kart h1 {
+      color: var(--primary-gold);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+    .ramazan-kart p {
+      color: #cbd5e1;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      font-style: italic;
+    }
+    
+    /* Arka planı örtmek için */
+    body::before { background: transparent; }
+  </style>
+</head>
+<body class="ramazan-bg">
+
+  <!-- Köşe Süslemeleri -->
+  <i class="fa-solid fa-moon corner-susleme ust-sol"></i>
+  <i class="fa-solid fa-moon corner-susleme alt-sag"></i>
+
+  <!-- Süzülen Yıldızlar İçin Konteyner -->
+  <div id="yildizlar"></div>
+
+  <header class="top-section" style="position: absolute; top: 0; width: 100%; z-index: 10; background: transparent;">
+    <div class="header-nav">
+      <button class="icon-btn" onclick="window.location.href='index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+      <span class="app-name" style="color: var(--primary-gold);">Ramazan Ayı</span>
+      <div style="width: 40px;"></div>
+    </div>
+  </header>
+
+  <main style="z-index: 10; width: 100%; display: flex; justify-content: center;">
+    <div class="ramazan-kart">
+      <i class="fa-solid fa-moon"></i>
+      <h1>Ramazan-ı Şerif</h1>
+      <p>"Ramazan ayı, insanlara yol gösterici, doğrunun ve doğruyu eğriden ayırmanın açık delilleri olarak Kur'an'ın indirildiği aydır."</p>
+      <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--primary-gold);">(Bakara Suresi, 185. Ayet)</p>
+      
+      <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="color: #fff;">İmsak ve İftar Vakitleri</p>
+        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: #94a3b8;">(Bu bölüm Ramazan ayında aktif olacaktır)</p>
+      </div>
+    </div>
+  </main>
+
+  <nav id="tabs" class="bottom-nav" style="z-index: 10;">
+    <button onclick="window.location.href='index.html'"><i class="fa-solid fa-clock"></i><span>Vakitler</span></button>
+    <button onclick="window.location.href='kible.html'"><i class="fa-solid fa-compass"></i><span>Kıble</span></button>
+    <button onclick="window.location.href='zikir.html'"><i class="fa-solid fa-circle-dot"></i><span>Zikir</span></button>
+    <button class="active" onclick="window.location.href='ramazan.html'"><i class="fa-solid fa-moon"></i><span>Ramazan</span></button>
+  </nav>
+
+  <script>
+    // Yıldızları Rastgele Oluşturma
+    const yildizlarDiv = document.getElementById('yildizlar');
+    const yildizSayisi = 50; // Ekranda olacak yıldız sayısı
+
+    for (let i = 0; i < yildizSayisi; i++) {
+      let yildiz = document.createElement('div');
+      yildiz.classList.add('yildiz');
+      
+      // Rastgele boyut, konum ve animasyon süresi
+      let boyut = Math.random() * 3 + 1; // 1px ile 4px arası
+      let solKonum = Math.random() * 100; // %0 ile %100 arası
+      let sure = Math.random() * 5 + 5; // 5 ile 10 saniye arası
+      let gecikme = Math.random() * 5; // 0 ile 5 saniye arası gecikme
+
+      yildiz.style.width = `${boyut}px`;
+      yildiz.style.height = `${boyut}px`;
+      yildiz.style.left = `${solKonum}%`;
+      yildiz.style.animationDuration = `${sure}s`;
+      yildiz.style.animationDelay = `${gecikme}s`;
+
+      yildizlarDiv.appendChild(yildiz);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Zikirmatik</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="top-section" style="padding-top: 2rem;">
+    <div class="header-nav">
+      <button class="icon-btn" onclick="window.location.href='index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+      <span class="app-name">Zikirmatik</span>
+      <div style="width: 40px;"></div>
+    </div>
+  </header>
+  <main class="main-content" style="text-align: center;">
+    <div id="zikirSayi" style="font-size: 6rem; font-weight: bold; color: var(--primary-gold); margin: 2rem 0;">0</div>
+    <button id="zikirArtir" style="width: 80%; padding: 1.5rem; border-radius: 50px; font-size: 1.2rem; background: var(--primary-gold); color: #000; border: none; font-weight: bold; cursor: pointer;">Zikir Çek</button>
+    <br><br>
+    <button id="zikirSifirla" style="background: none; border: 1px solid #cbd5e1; color: #cbd5e1; padding: 0.5rem 2rem; border-radius: 20px; cursor: pointer;">Sıfırla</button>
+  </main>
+  <nav id="tabs" class="bottom-nav">
+    <button onclick="window.location.href='index.html'"><i class="fa-solid fa-clock"></i><span>Vakitler</span></button>
+    <button onclick="window.location.href='kible.html'"><i class="fa-solid fa-compass"></i><span>Kıble</span></button>
+    <button class="active" onclick="window.location.href='zikir.html'"><i class="fa-solid fa-circle-dot"></i><span>Zikir</span></button>
+    <button onclick="window.location.href='ramazan.html'"><i class="fa-solid fa-moon"></i><span>Ramazan</span></button>
+  </nav>
+  <script src="js/zikirmatik.js"></script>
+  <script>ZikirMatik.init();</script>
+</body>
+</html>

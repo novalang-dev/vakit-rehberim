@@ -1,7 +1,11 @@
-const CACHE_NAME = 'vakit-rehberim-v1.1.2'; // Sürümü artırdık ki eski önbelleği temizlesin
+const CACHE_NAME = 'vakit-rehberim-v1.1.3'; // Sürümü artırdık ki eski önbelleği temizlesin
 const ASSETS = [
   '/',
   '/index.html',
+  '/kible.html',
+  '/zikir.html',
+  '/ramazan.html',
+  '/dini_gunler.html',
   '/manifest.json',
   '/css/style.css',
   '/js/app.js',

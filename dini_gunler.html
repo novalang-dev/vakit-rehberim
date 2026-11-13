@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dini Günler ve Geceler</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Dini Günler Sayfasına Özel Stiller */
+    .year-tabs {
+      display: flex;
+      overflow-x: auto;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(0,0,0,0.2);
+      scrollbar-width: none;
+    }
+    .year-tabs::-webkit-scrollbar { display: none; }
+    .year-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.3s;
+    }
+    .year-btn.active {
+      background: var(--primary-gold);
+      color: #000;
+      font-weight: bold;
+      border-color: var(--primary-gold);
+    }
+
+    .dini-gun-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .dini-gun-item {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+    .dini-gun-item .tarih {
+      text-align: center;
+      background: rgba(245, 176, 65, 0.15);
+      color: var(--primary-gold);
+      padding: 0.5rem;
+      border-radius: 8px;
+      min-width: 60px;
+    }
+    .dini-gun-item .tarih .gun { font-size: 1.5rem; font-weight: bold; }
+    .dini-gun-item .tarih .ay { font-size: 0.8rem; }
+    
+    .dini-gun-item .isim-alani {
+      flex: 1;
+      padding-left: 1rem;
+    }
+    .dini-gun-item .isim { font-size: 1.1rem; font-weight: bold; }
+    .dini-gun-item .aciklama { font-size: 0.8rem; color: #94a3b8; margin-top: 0.3rem; }
+
+    /* Kalan Gün Badge */
+    .kalan-gun {
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.1);
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      color: var(--primary-gold);
+      white-space: nowrap;
+    }
+    .kalan-gun.gecmis {
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-section" style="padding-top: 2rem;">
+    <div class="header-nav">
+      <button class="icon-btn" onclick="window.location.href='index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+      <span class="app-name">Dini Günler</span>
+      <div style="width: 40px;"></div>
+    </div>
+  </header>
+
+  <!-- Yıl Sekmeleri -->
+  <div class="year-tabs">
+    <button class="year-btn active" onclick="yilSec(2026)">2026</button>
+    <button class="year-btn" onclick="yilSec(2027)">2027</button>
+    <button class="year-btn" onclick="yilSec(2028)">2028</button>
+  </div>
+
+  <!-- Dini Günler Listesi -->
+  <main class="main-content">
+    <div id="diniGunList" class="dini-gun-list">
+      <!-- JavaScript ile doldurulacak -->
+    </div>
+  </main>
+
+  <nav id="tabs" class="bottom-nav">
+    <button class="active" onclick="window.location.href='index.html'"><i class="fa-solid fa-clock"></i><span>Vakitler</span></button>
+    <button onclick="window.location.href='kible.html'"><i class="fa-solid fa-compass"></i><span>Kıble</span></button>
+    <button onclick="window.location.href='zikir.html'"><i class="fa-solid fa-circle-dot"></i><span>Zikir</span></button>
+    <button onclick="window.location.href='ramazan.html'"><i class="fa-solid fa-moon"></i><span>Ramazan</span></button>
+  </nav>
+
+  <script>
+    // SENİN VERDİĞİN TARİHLERLE OLUŞTURULMUŞ VERİ TABANI
+    const DINI_GUNLER = {
+      2026: [
+        { gun: 15, ay: 'Ocak', ayIndex: 0, isim: 'Miraç Kandili', aciklama: '26 Receb 1447' },
+        { gun: 2,  ay: 'Şubat', ayIndex: 1, isim: 'Berat Kandili', aciklama: '14 Şaban 1447' },
+        { gun: 19, ay: 'Şubat', ayIndex: 1, isim: 'Ramazan Başlangıcı', aciklama: '1 Ramazan 1447' },
+        { gun: 16, ay: 'Mart', ayIndex: 2, isim: 'Kadir Gecesi', aciklama: '26 Ramazan 1447' },
+        { gun: 19, ay: 'Mart', ayIndex: 2, isim: 'Ramazan Bayramı Arefesi', aciklama: '29 Ramazan 1447' },
+        { gun: 20, ay: 'Mart', ayIndex: 2, isim: 'Ramazan Bayramı 1. Gün', aciklama: '1 Şevval 1447' },
+        { gun: 21, ay: 'Mart', ayIndex: 2, isim: 'Ramazan Bayramı 2. Gün', aciklama: '2 Şevval 1447' },
+        { gun: 22, ay: 'Mart', ayIndex: 2, isim: 'Ramazan Bayramı 3. Gün', aciklama: '3 Şevval 1447' },
+        { gun: 26, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı Arefesi', aciklama: '9 Zilhicce 1447' },
+        { gun: 27, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı 1. Gün', aciklama: '10 Zilhicce 1447' },
+        { gun: 28, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı 2. Gün', aciklama: '11 Zilhicce 1447' },
+        { gun: 29, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı 3. Gün', aciklama: '12 Zilhicce 1447' },
+        { gun: 30, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı 4. Gün', aciklama: '13 Zilhicce 1447' },
+        { gun: 16, ay: 'Haziran', ayIndex: 5, isim: 'Hicri Yılbaşı', aciklama: '1 Muharrem 1448' },
+        { gun: 25, ay: 'Haziran', ayIndex: 5, isim: 'Aşure Günü', aciklama: '10 Muharrem 1448' },
+        { gun: 24, ay: 'Ağustos', ayIndex: 7, isim: 'Mevlid Kandili', aciklama: '12 Rebiülevvel 1448' },
+        { gun: 10, ay: 'Aralık', ayIndex: 11, isim: 'Üç Aylar Başlangıcı / Regaib', aciklama: '1 Receb 1448' }
+      ],
+      2027: [
+        { gun: 4,  ay: 'Ocak', ayIndex: 0, isim: 'Miraç Kandili', aciklama: '26 Receb 1448' },
+        { gun: 22, ay: 'Ocak', ayIndex: 0, isim: 'Berat Kandili', aciklama: '14 Şaban 1448' },
+        { gun: 8,  ay: 'Şubat', ayIndex: 1, isim: 'Ramazan Başlangıcı', aciklama: '1 Ramazan 1448' },
+        { gun: 5,  ay: 'Mart', ayIndex: 2, isim: 'Kadir Gecesi', aciklama: '26 Ramazan 1448' },
+        { gun: 9,  ay: 'Mart', ayIndex: 2, isim: 'Ramazan Bayramı 1. Gün', aciklama: '1 Şevval 1448' },
+        { gun: 10, ay: 'Mart', ayIndex: 2, isim: 'Ramazan Bayramı 2. Gün', aciklama: '2 Şevval 1448' },
+        { gun: 11, ay: 'Mart', ayIndex: 2, isim: 'Ramazan Bayramı 3. Gün', aciklama: '3 Şevval 1448' },
+        { gun: 16, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı 1. Gün', aciklama: '10 Zilhicce 1448' },
+        { gun: 17, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı 2. Gün', aciklama: '11 Zilhicce 1448' },
+        { gun: 18, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı 3. Gün', aciklama: '12 Zilhicce 1448' },
+        { gun: 19, ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı 4. Gün', aciklama: '13 Zilhicce 1448' },
+        { gun: 6,  ay: 'Haziran', ayIndex: 5, isim: 'Hicri Yılbaşı', aciklama: '1 Muharrem 1449' },
+        { gun: 15, ay: 'Haziran', ayIndex: 5, isim: 'Aşure Günü', aciklama: '10 Muharrem 1449' },
+        { gun: 13, ay: 'Ağustos', ayIndex: 7, isim: 'Mevlid Kandili', aciklama: '12 Rebiülevvel 1449' },
+        { gun: 29, ay: 'Ekim', ayIndex: 9, isim: 'Üç Aylar Başlangıcı', aciklama: '1 Receb 1449' },
+        { gun: 2,  ay: 'Aralık', ayIndex: 11, isim: 'Regaib Kandili', aciklama: '4 Receb 1449' },
+        { gun: 24, ay: 'Aralık', ayIndex: 11, isim: 'Miraç Kandili', aciklama: '26 Receb 1449' }
+      ],
+      2028: [
+        { gun: 28, ay: 'Ocak', ayIndex: 0, isim: 'Ramazan Başlangıcı', aciklama: '1 Ramazan 1449' },
+        { gun: 22, ay: 'Şubat', ayIndex: 1, isim: 'Kadir Gecesi', aciklama: '27 Ramazan 1449' },
+        { gun: 26, ay: 'Şubat', ayIndex: 1, isim: 'Ramazan Bayramı', aciklama: '1 Şevval 1449' },
+        { gun: 5,  ay: 'Mayıs', ayIndex: 4, isim: 'Kurban Bayramı', aciklama: '10 Zilhicce 1449' },
+        { gun: 25, ay: 'Mayıs', ayIndex: 4, isim: 'Hicri Yılbaşı', aciklama: '1 Muharrem 1450' },
+        { gun: 2,  ay: 'Ağustos', ayIndex: 7, isim: 'Mevlid Kandili', aciklama: '12 Rebiülevvel 1450' },
+        { gun: 23, ay: 'Kasım', ayIndex: 10, isim: 'Regaib Kandili', aciklama: 'İlk Cuma, Receb 1450' },
+        { gun: 13, ay: 'Aralık', ayIndex: 11, isim: 'Miraç Kandili', aciklama: '27 Receb 1450' },
+        { gun: 30, ay: 'Aralık', ayIndex: 11, isim: 'Berat Kandili', aciklama: '15 Şaban 1450' }
+      ]
+    };
+
+    function yilSec(yil) {
+      document.querySelectorAll('.year-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.innerText == yil) btn.classList.add('active');
+      });
+
+      const listDiv = document.getElementById('diniGunList');
+      listDiv.innerHTML = '';
+
+      // Bugünün tarihi (Saatleri sıfırlayarak sadece gün bazında hesap yapmak için)
+      const bugun = new Date();
+      bugun.setHours(0, 0, 0, 0);
+
+      if (DINI_GUNLER[yil]) {
+        DINI_GUNLER[yil].forEach(gun => {
+          // Etkinliğin tarihini oluştur (Yıl, Ay Index, Gün)
+          const etkinlikTarihi = new Date(yil, gun.ayIndex, gun.gun);
+          
+          // İki tarih arasındaki farkı gün olarak hesapla
+          const farkMs = etkinlikTarihi - bugun;
+          const kalanGun = Math.ceil(farkMs / (1000 * 60 * 60 * 24));
+          
+          let kalanGunHtml = '';
+          if (kalanGun > 0) {
+            kalanGunHtml = `<div class="kalan-gun">${kalanGun} gün kaldı</div>`;
+          } else if (kalanGun === 0) {
+            kalanGunHtml = `<div class="kalan-gun" style="background:var(--primary-gold); color:#000; font-weight:bold;">Bugün</div>`;
+          } else {
+            kalanGunHtml = `<div class="kalan-gun gecmis">Geçti</div>`;
+          }
+
+          const item = document.createElement('div');
+          item.className = 'dini-gun-item';
+          item.innerHTML = `
+            <div class="tarih">
+              <div class="gun">${gun.gun}</div>
+              <div class="ay">${gun.ay}</div>
+            </div>
+            <div class="isim-alani">
+              <div class="isim">${gun.isim}</div>
+              <div class="aciklama">${gun.aciklama}</div>
+            </div>
+            ${kalanGunHtml}
+          `;
+          listDiv.appendChild(item);
+        });
+      } else {
+        listDiv.innerHTML = '<p style="text-align:center; color:#94a3b8;">Bu yıl için veri bulunamadı.</p>';
+      }
+    }
+
+    // Sayfa açıldığında varsayılan olarak içinde bulunduğumuz yılı veya 2026'yı yükle
+    document.addEventListener('DOMContentLoaded', () => {
+      const simdikiYil = new Date().getFullYear();
+      if (DINI_GUNLER[simdikiYil]) {
+        yilSec(simdikiYil);
+        // Aktif yıl butonunu ayarla
+        document.querySelectorAll('.year-btn').forEach(btn => {
+          if(btn.innerText == simdikiYil) {
+            document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          }
+        });
+      } else {
+        yilSec(2026);
+      }
+    });
+  </script>
+</body>
+</html>

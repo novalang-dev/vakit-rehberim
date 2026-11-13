@@ -6,8 +6,9 @@
   <title>Vakit Rehberim</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b3d2e">
-  <link rel="icon" type="image/png" href="assets/icon-192.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SweetAlert2 Eklendi -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -21,13 +22,12 @@
     </div>
     <ul class="side-menu-list">
       <li id="menuAyarlar"><div class="menu-icon"><i class="fa-solid fa-sliders"></i></div> Ayarlar</li>
-      <li id="menuKonumlar"><div class="menu-icon"><i class="fa-solid fa-location-dot"></i></div> Konumlarım</li>
-      <li><div class="menu-icon"><i class="fa-solid fa-mosque"></i></div> Yakındaki Camiler</li>
-      <li><div class="menu-icon"><i class="fa-solid fa-compass"></i></div> Kıble Pusulası</li>
-      <li><div class="menu-icon"><i class="fa-solid fa-calendar-days"></i></div> Dini Günler</li>
-      <li><div class="menu-icon"><i class="fa-solid fa-comment-dots"></i></div> Geri Bildirim</li>
+      <li id="menuCamiler"><div class="menu-icon"><i class="fa-solid fa-mosque"></i></div> Yakındaki Camiler</li>
+      <li id="menuKible"><div class="menu-icon"><i class="fa-solid fa-compass"></i></div> Kıble Pusulası</li>
+      <li id="menuDiniGunler"><div class="menu-icon"><i class="fa-solid fa-calendar-days"></i></div> Dini Günler</li>
+      <li id="menuGeriBildirim"><div class="menu-icon"><i class="fa-solid fa-comment-dots"></i></div> Geri Bildirim</li>
     </ul>
-    <div class="side-menu-footer"><span>v1.1.2</span></div>
+    <div class="side-menu-footer"><span>v1.1.3</span></div>
   </div>
   <div id="menuOverlay" class="menu-overlay"></div>
 
@@ -44,13 +44,6 @@
           <strong>Namaz Vakitleri Bildirim Çubuğu</strong>
           <label class="switch"><input type="checkbox"><span class="slider round"></span></label>
         </div>
-      </div>
-      <div class="setting-card">
-        <div class="setting-row">
-          <strong>Sessiz Mod</strong>
-          <label class="switch"><input type="checkbox"><span class="slider round"></span></label>
-        </div>
-        <p class="setting-desc">Namaz vaktinin 5 dakika öncesinden başlar 30 dakika sonrasına kadar telefonunuzun sessizde kalmasını sağlar.</p>
       </div>
       <div class="setting-card">
         <div class="setting-row">
@@ -93,6 +86,7 @@
     </div>
   </div>
 
+
   <!-- ÜST KISIM -->
   <header class="top-section">
     <div class="header-nav">
@@ -106,18 +100,13 @@
     </div>
     <div class="date-info-area">
       <div class="date-box">
-        <span id="hijriGun" class="val">--</span>
-        <span id="hijriAy" class="lbl">--</span>
-        <span id="hijriYil" class="val">--</span>
+        <span id="hijriGun" class="val">--</span><span id="hijriAy" class="lbl">--</span><span id="hijriYil" class="val">--</span>
       </div>
       <div class="date-box">
-        <span id="miladiGun" class="val">--</span>
-        <span id="miladiAy" class="lbl">--</span>
-        <span id="miladiYil" class="val">--</span>
+        <span id="miladiGun" class="val">--</span><span id="miladiAy" class="lbl">--</span><span id="miladiYil" class="val">--</span>
       </div>
       <div class="date-box">
-        <span class="lbl">Yerel saat</span>
-        <span id="yerelSaat" class="val">--:--</span>
+        <span class="lbl">Yerel saat</span><span id="yerelSaat" class="val">--:--</span>
       </div>
     </div>
   </header>
@@ -125,64 +114,33 @@
   <!-- YATAY VAKİT MENÜSÜ -->
   <section class="horizontal-menu" id="horizontalVakitler"></section>
 
-  <!-- ORTA KISIM (SEKMELER) -->
+  <!-- ORTA KISIM -->
   <main class="main-content">
-    
-    <!-- VAKİTLER SEKMESİ -->
-    <div id="tab-vakitler">
-      <div class="weekly-table-container" id="weeklyTableContainer">
-        <table class="weekly-table">
-          <thead><tr><th></th><th>İmsak</th><th>Güneş</th><th>Öğle</th><th>İkindi</th><th>Akşam</th><th>Yatsı</th></tr></thead>
-          <tbody id="weeklyTableBody"></tbody>
-        </table>
+    <div class="weekly-table-container" id="weeklyTableContainer">
+      <table class="weekly-table">
+        <thead><tr><th></th><th>İmsak</th><th>Güneş</th><th>Öğle</th><th>İkindi</th><th>Akşam</th><th>Yatsı</th></tr></thead>
+        <tbody id="weeklyTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="content-cards">
+      <div class="info-card">
+        <div class="card-icon"><i class="fa-solid fa-book-open"></i></div>
+        <div class="card-text"><strong>Bir Ayet</strong><p id="gununAyeti">Yükleniyor...</p></div>
       </div>
-
-      <div class="content-cards">
-        <div class="info-card">
-          <div class="card-icon"><i class="fa-solid fa-book-open"></i></div>
-          <div class="card-text"><strong>Bir Ayet</strong><p id="gununAyeti">Yükleniyor...</p></div>
-        </div>
-        <div class="info-card">
-          <div class="card-icon"><i class="fa-solid fa-mosque"></i></div>
-          <div class="card-text"><strong>Bir Hadis</strong><p id="gununHadisi">Yükleniyor...</p></div>
-        </div>
-        <div class="info-card">
-          <div class="card-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
-          <div class="card-text"><strong>Bir Dua</strong><p id="gununDuasi">Yükleniyor...</p></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- KIBLE SEKMESİ -->
-    <div id="tab-kible" style="display: none; text-align: center; padding: 2rem;">
-      <i class="fa-solid fa-compass" style="font-size: 5rem; color: var(--primary-gold); margin-bottom: 1rem;"></i>
-      <h2>Kıble Pusulası</h2>
-      <p style="margin-top: 1rem; color: #cbd5e1;">Cihazınızı düz tutarak kıble yönünü bulabilirsiniz. (Telefon sensörü gerektirir)</p>
-      <div id="kiblePusula" style="margin-top: 1rem; font-size: 1.2rem; color: var(--primary-gold);">Yön: --</div>
-    </div>
-
-    <!-- ZİKİRMATİK SEKMESİ -->
-    <div id="tab-zikirmatik" style="display: none; text-align: center; padding: 2rem;">
-      <div id="zikirSayi" style="font-size: 5rem; font-weight: bold; color: var(--primary-gold); margin: 2rem 0;">0</div>
-      <button id="zikirArtir" class="btn-primary" style="width: 80%; padding: 1.5rem; border-radius: 50px; font-size: 1.2rem; background: var(--primary-gold); color: #000; border: none; font-weight: bold; cursor: pointer;">Zikir Çek</button>
-      <br><br>
-      <button id="zikirSifirla" style="background: none; border: 1px solid #cbd5e1; color: #cbd5e1; padding: 0.5rem 2rem; border-radius: 20px; cursor: pointer;">Sıfırla</button>
-    </div>
-
-    <!-- DUALAR SEKMESİ -->
-    <div id="tab-dua" style="display: none;">
-      <div class="content-cards" id="duaListesi">
-        <!-- JS ile doldurulacak -->
+      <div class="info-card">
+        <div class="card-icon"><i class="fa-solid fa-mosque"></i></div>
+        <div class="card-text"><strong>Bir Hadis</strong><p id="gununHadisi">Yükleniyor...</p></div>
       </div>
     </div>
   </main>
 
-  <!-- ALT MENÜ -->
+  <!-- ALT MENÜ (Sayfalara Yönlendirme) -->
   <nav id="tabs" class="bottom-nav">
-    <button data-tab="vakitler" class="active"><i class="fa-solid fa-clock"></i><span>Vakitler</span></button>
-    <button data-tab="kible"><i class="fa-solid fa-compass"></i><span>Kıble</span></button>
-    <button data-tab="zikirmatik"><i class="fa-solid fa-circle-dot"></i><span>Zikir</span></button>
-    <button data-tab="dua"><i class="fa-solid fa-hand-holding-heart"></i><span>Dualar</span></button>
+    <button class="active" onclick="window.location.href='index.html'"><i class="fa-solid fa-clock"></i><span>Vakitler</span></button>
+    <button onclick="window.location.href='kible.html'"><i class="fa-solid fa-compass"></i><span>Kıble</span></button>
+    <button onclick="window.location.href='zikir.html'"><i class="fa-solid fa-circle-dot"></i><span>Zikir</span></button>
+    <button onclick="window.location.href='ramazan.html'"><i class="fa-solid fa-moon"></i><span>Ramazan</span></button>
   </nav>
 
   <script src="js/db.js"></script>
@@ -190,5 +148,7 @@
   <script src="js/icerikler.js"></script>
   <script src="js/zikirmatik.js"></script>
   <script src="js/app.js"></script>
+
+
 </body>
 </html>

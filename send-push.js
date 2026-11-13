@@ -8,7 +8,7 @@ const privateVapidKey = process.env.VAPID_PRIVATE;
 const subscription = JSON.parse(process.env.SUBSCRIPTION_JSON);
 
 webpush.setVapidDetails(
-  'mailto:ahmetensar602@gmail.com',
+  'mailto:ahmetensar602@gmail.com', // E-posta adresin
   publicVapidKey,
   privateVapidKey
 );
@@ -20,36 +20,35 @@ const motorPath = path.join(process.cwd(), 'js', 'motor.js');
 let dbCode = fs.readFileSync(dbPath, 'utf8');
 let motorCode = fs.readFileSync(motorPath, 'utf8');
 
-// Sadece Node.js'in anlayacağı şekilde paketliyoruz
 const tempModuleCode = `
   ${dbCode}
   ${motorCode}
-  
   module.exports = { IL_ILCE_DB, getTimes };
 `;
 
-// Geçici dosyayı oluştur ve içine yaz
 const tempPath = path.join(process.cwd(), 'temp-motor.cjs');
 fs.writeFileSync(tempPath, tempModuleCode);
 
-// Geçici dosyayı çağır
 const { IL_ILCE_DB, getTimes } = require(tempPath);
 
+// Tarih ve saat bilgisi (Türkiye saati ile karşılaştırmak için)
 const now = new Date();
-const y = now.getFullYear();
-const m = now.getMonth() + 1;
-const d = now.getDate();
+// GitHub Actions UTC (Londra) saatine göre çalışır. Türkiye saati UTC+3'tür.
+const trDate = new Date(now.getTime() + (3 * 60 * 60 * 1000)); 
+const y = trDate.getUTCFullYear();
+const m = trDate.getUTCMonth() + 1;
+const d = trDate.getUTCDate();
+const trHour = trDate.getUTCHours();
+const trMinute = trDate.getUTCMinutes();
 
 let city = 'Yozgat';
 let dist = 'Sorgun';
 
 if (!IL_ILCE_DB[city] || !IL_ILCE_DB[city][dist]) {
-  console.log(`Uyarı: ${city}/${dist} bulunamadı. İlk geçerli konum aranıyor...`);
   const firstCity = Object.keys(IL_ILCE_DB)[0];
   const firstDist = Object.keys(IL_ILCE_DB[firstCity])[0];
   city = firstCity;
   dist = firstDist;
-  console.log(`Kullanılan konum: ${city}/${dist}`);
 }
 
 const vakitler = getTimes(y, m, d, city, dist);
@@ -59,16 +58,46 @@ if (!vakitler) {
   process.exit(1);
 }
 
-const hedefVakitAdi = 'Akşam';
-const hedefVakitSaati = vakitler.aksam;
+// İmsak ve Güneş hariç, sadece bildirim atılacak vakitler
+const hedefVakitler = {
+  'ogle': 'Öğle',
+  'ikindi': 'İkindi',
+  'aksam': 'Akşam',
+  'yatsi': 'Yatsı'
+};
 
-console.log(`Bugünün ${hedefVakitAdi} vakti: ${hedefVakitSaati}`);
+let bildirimGonderilecekVakit = null;
+let vakitSaati = "";
 
-const payload = JSON.stringify({
-  title: 'Vakit Rehberim',
-  body: `Bugünün ${hedefVakitAdi} ezanı saat ${hedefVakitSaati}'te okunacak.`
-});
+// Şu anki saatin, vakitlerden herhangi birine denk gelip gelmediğini kontrol et
+for (const [key, isim] of Object.entries(hedefVakitler)) {
+  const vakit = vakitler[key]; // Örn: "12:28"
+  if (vakit) {
+    const [vH, vM] = vakit.split(':').map(Number);
+    
+    // Eğer şu anki saat ve dakika, vaktin saat ve dakikasına eşitse (veya 1 dk sapma varsa)
+    // GitHub bazen geç çalışabileceği için 0 veya 1 dakika tolerans koyuyoruz.
+    if (trHour === vH && Math.abs(trMinute - vM) <= 1) {
+      bildirimGonderilecekVakit = isim;
+      vakitSaati = vakit;
+      break;
+    }
+  }
+}
 
-webpush.sendNotification(subscription, payload)
-  .then(() => console.log('Bildirim Başarıyla Gönderildi!'))
-  .catch(err => console.error('Hata:', err));
+// Eğer bir vakte denk geliyorsa bildirim gönder
+if (bildirimGonderilecekVakit) {
+  console.log(`Şu an ${bildirimGonderilecekVakit} vakti (${vakitSaati}). Bildirim gönderiliyor...`);
+  
+  const payload = JSON.stringify({
+    title: 'Vakit Rehberim',
+    body: `${bildirimGonderilecekVakit} ezanı okunuyor. Hayırlı ibadetler!`
+  });
+
+  webpush.sendNotification(subscription, payload)
+    .then(() => console.log('Bildirim Başarıyla Gönderildi!'))
+    .catch(err => console.error('Hata:', err));
+} else {
+  // Eğer o an ezan vakti değilse hiçbir şey yapma (bildirim gönderme)
+  console.log(`Şu an (${trHour}:${trMinute}) ezan vakti değil. Beklemeye devam...`);
+}

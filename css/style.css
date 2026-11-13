@@ -17,6 +17,12 @@ body {
   background-position: center;
   background-attachment: fixed;
   padding-bottom: 70px;
+  animation: sayfaAcilisi 0.4s ease-out forwards;
+}
+
+@keyframes sayfaAcilisi {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 body::before {
@@ -87,6 +93,7 @@ body.yatsi { background-image: url('../assets/yatsi.jpg'); }
   padding: 0.6rem 0.2rem;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .h-vakit-item.active {
@@ -190,14 +197,22 @@ body.yatsi { background-image: url('../assets/yatsi.jpg'); }
 .menu-icon { color: var(--primary-gold); font-size: 1.2rem; width: 24px; text-align: center; }
 .side-menu-footer { padding: 1rem; text-align: center; color: #64748b; font-size: 0.8rem; }
 
-/* --- MODALLAR (Ayarlar ve Konum) --- */
+/* --- MODALLAR (Ayarlar, Konum ve Ses) --- */
 .settings-modal {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: #f8f9fa; z-index: 1001;
-  transform: translateY(100%); transition: transform 0.3s ease;
-  display: flex; flex-direction: column;
+  position: fixed; 
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #f8f9fa; 
+  z-index: 9999;
+  /* transform yerine display ile kontrol edelim */
+  display: none; 
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
-.settings-modal.open { transform: translateY(0); }
+.settings-modal.open { 
+  display: flex; /* Açılınca görünür yap */
+}
+
 .settings-header {
   background: white; padding: 1rem;
   display: flex; justify-content: space-between; align-items: center;
